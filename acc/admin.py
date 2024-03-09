@@ -2,49 +2,68 @@ from django.contrib             import admin
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.admin  import UserAdmin, GroupAdmin
 from .models                    import (
-  acc,
+
   CustomUser,
   CustomGroup,
-  
+  absent
   )
 
+from main.admin   import omar_admin_site
 
-class AccAdminStyle(admin.ModelAdmin):
+class AbsentInlineStack(admin.StackedInline):
   
-  list_display  = ("name", "salary", "phone_nu", "id_for")
+  model = absent
+  extra = 0
+  verbose_name = "يوم غياب"
+  verbose_name_plural = "غيابات الموظف"
 
-  list_filter   = ("gender", )
-  search_fields = ("salary", "name", "phone_nu", "id_for") 
+
+
+class CustomUSerAdmin(UserAdmin):
   
-  fields        = (
-    "pers_pho",
-    "photo_for_man",
-    "the_acc",
-    "name",
-    "salary",
+  
+
+  fieldsets = list(UserAdmin.fieldsets)
+  fieldsets.insert(0, ("الأساسى", {
+    "fields" : (
+      "photo_f",
+      "pers_pho",
+      "salary",
+      "gender",
+      "phone_nu",
+      "id_for",
+      "date_ofj",
+      )
+  }))
+  fieldsets.pop(2)
+  
+  readonly_fields = (
+    "photo_f",
+  )
+  inlines = (
+    AbsentInlineStack , 
+  )
+  
+  search_fields = (
+    "username",
+    
+  )
+  list_filter =(
     "gender",
-    "phone_nu",
+    
+  )
+  list_display = (
+    "username",
+    "salary"  ,
     "id_for",
-    "date_ofj",
+    
     
   )
 
-  readonly_fields = (
-    "photo_for_man",
-  )
-  
 
-admin.site.unregister(User)
-admin.site.unregister(Group)
+omar_admin_site.register(CustomUser, CustomUSerAdmin)
+omar_admin_site.register(CustomGroup, GroupAdmin)
 
-
-
-class CustomUSerAdmin(UserAdmin):pass
-
-
-admin.site.register(CustomUser, CustomUSerAdmin)
-admin.site.register(CustomGroup, GroupAdmin)
-admin.site.register(acc , AccAdminStyle)
 
 
 

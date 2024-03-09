@@ -1,5 +1,23 @@
 from django.db import models
 from datetime import datetime
+from manufacturers.models import ManfComponentRel, Components
+
+
+class Products(models.Model):
+  
+  mnaf = models.ForeignKey(ManfComponentRel, on_delete=models.CASCADE,verbose_name="المنتج", null=True, blank=True)
+  
+  price= models.FloatField(verbose_name="السعر")
+  
+  shopin= models.ForeignKey("Shop",on_delete=models.SET_NULL, null=True, blank=True, verbose_name="يعرض في محل")
+
+
+  class Meta:
+    
+    verbose_name =   "منتج"
+    verbose_name_plural = "منتجات"
+  def __str__(self):
+    return f"{self.mnaf.manf.name}"
 
 
 class WarehouseProductRel(models.Model):
@@ -9,23 +27,6 @@ class WarehouseProductRel(models.Model):
   
 
 
-
-
-class ProductTypes(models.base.Model):
-  name = models.CharField(max_length=255, verbose_name="اسم")
-  desc = models.TextField( blank=True, null=True, verbose_name="الوصف")
-
-  def __str__(self):
-    return f"{self.name}"
-  
-  class Meta:
-    
-    verbose_name ="نوع المنتج"
-    verbose_name_plural ="نوع المنتج"
-
-
-
-
 class saler(models.Model):
   
   name     = models.CharField(max_length=255, verbose_name="اسم البائع")
@@ -33,7 +34,7 @@ class saler(models.Model):
   addr     = models.TextField(verbose_name="العنوان"                   ,blank=True, null=True)
   isdeb    = models.BooleanField(default=False, verbose_name="دائن؟")
   how_much = models.FloatField(default=0, verbose_name="المقدار")
-
+  prod     = models.ManyToManyField(Components, verbose_name="القطع", )
   
   
   
@@ -41,31 +42,11 @@ class saler(models.Model):
     return f"{self.name}"
   class Meta:
     
-    verbose_name_plural = "البائعون"
-    verbose_name = "البائع"
+    verbose_name_plural = "الموردون"
+    verbose_name = "المورد"
   
 
-
-class Products(models.Model):
-  
-  
-  p_type      = models.ForeignKey(ProductTypes, on_delete=models.SET_NULL, null=True, verbose_name="نوع المنتج")
-  name        = models.CharField(max_length=255, verbose_name="اسم المنتج")
-  amount      = models.IntegerField(verbose_name="الكمية")
-  salary      = models.FloatField(default=0, verbose_name="سعره للواحد")
-  got_it_from = models.ForeignKey(saler, verbose_name='تم شرائه من',  blank=True, null=True, on_delete=models.SET_NULL)
-  shop_in     = models.ForeignKey("Shop", on_delete=models.SET_NULL, verbose_name="المحل", null=True, blank=True)
-
-  def i_am_in(self):
-    rel = WarehouseProductRel.objects.filter(products=self)
-
-    return [x.warehouse for x in rel]
-
-  class Meta:
-    
-    verbose_name        = "منتجات"
-    verbose_name_plural = "منتجات"
-  
+ 
   def the_rel(self):
     mr = WarehouseProductRel.objects.filter(products=self)
     return mr
@@ -102,30 +83,7 @@ class Warehouse(models.Model):
     
     return result
   
-  
-  def other_obj(self):
-    
-    pp = Products.objects.all()
-
-    li = []
-    for i in pp:
-      if len(i.the_rel()) != 0:
-        for r in i.the_rel():
-            if self == r.warehouse:
-              pass
-            else:
-              li.append(i)
-      else:
-        try:
-          
-          m = WarehouseProductRel.objects.get(products=i, warehouse=self)
-          v = f'{m.how_many} {m.warehouse.name}'
-        except:
-          v = "ليس في مخزن"
-        li.append([i,v ])
-
-    return li
-
+ 
   def our_obj(self):
     pp = WarehouseProductRel.objects.all()
     li = []
@@ -136,10 +94,6 @@ class Warehouse(models.Model):
           li.append(i)
         
     return li
-  
-  @classmethod
-  def class_name(cls):
-    return "warehouse"
 
 # 
 
@@ -186,19 +140,23 @@ class sales(models.Model):
 
   
   what_got_saled = models.ForeignKey(Products, verbose_name='المنتج', null=True, blank=True, on_delete=models.CASCADE)
-  how_many       = models.FloatField(default=0, verbose_name='الكمية')
+  how_many       = models.FloatField(default=1, verbose_name='الكمية')
   who_bought     = models.ForeignKey(zabon, verbose_name='الزبون', null=True, blank=True, on_delete=models.CASCADE)
   time_added     = models.DateTimeField(default=datetime.now, editable=False, verbose_name="وقت الاضافة")
   
   
-
+  def win(self):
+    
+    return self.what_got_saled.price * self.how_many
+  win.short_description = "المبلغ"
 
   class Meta:
-    
+
     verbose_name_plural = "المبيعات"
-    verbose_name = "بيعة"
+    verbose_name        = "بيعة"
 
   def __str__(self):
+    
     return f"{self.what_got_saled}"
 
 
@@ -248,15 +206,3 @@ class Shop(models.Model):
     
     
 
-class Factory(models.Model):
-  
-  name   = models.CharField(max_length=255, verbose_name="اسم المصنع",)
-  addr   = models.TextField(verbose_name="عنوان المصنع", blank=True, null=True)
-  spic   = models.ForeignKey(Products, blank=True, null=True, verbose_name="التخصص",on_delete=models.SET_NULL)
-
-  
-  class Meta:
-    verbose_name = "مصنع"
-    verbose_name_plural = "المصانع"
-  def __str__(self):
-    return f"{self.name}"

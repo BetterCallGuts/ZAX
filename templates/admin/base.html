@@ -81,7 +81,7 @@
 
                 {% get_top_menu user request.current_app|default:"admin" as top_menu %}
                 {% for link in top_menu %}
-                yoo
+                
                     <li class="nav-item d-none d-sm-inline-block{% if link.children %} dropdown{% endif %}">
                         {% if link.children %}
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -164,45 +164,15 @@
                     <!--  -->
 
 
-                    <li class="nav-item dropdown no-arrow mx-1 show">
-                        <a class="nav-link dropdown-toggle" href="#" id="messagesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                          <i class="fas fa-envelope fa-fw"></i>
-                          <!-- Counter - Messages -->
-                          <span class="badge badge-danger badge-counter"></span>
-                        </a>
-                        <!-- Dropdown - Messages -->
-                        
-                      </li>
-                    <!--  -->
-                    <a class="nav-link btn" data-toggle="dropdown" href="#" title="{{ request.user }}">
-                        <i class="far fa-user" aria-hidden="true"></i>
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-left" id="jazzy-usermenu">
-                        <span class="dropdown-header">{% trans 'Account' %}</span>
-                        <div class="dropdown-divider"></div>
-                        <a href="{% url 'admin:password_change' %}" class="dropdown-item">
-                            <i class="fas fa-key mr-2"></i> {% trans 'Change password' %}
-                        </a>
-                        <div class="dropdown-divider"></div>
+                   
+                    
                         <form action="{% url 'admin:logout' %}" method="post">
                             {% csrf_token %}
                             <button class="dropdown-item">
                                  <i class="fas fa-users mr-2"></i> {% trans 'Log out' %}
                             </button>
                         </form>
-                        
-                        {% get_user_menu user request.current_app|default:"admin" as user_menu %}
-                        {% for link in user_menu %}
-                            <div class="dropdown-divider"></div>
-                            <a href="{{ link.url }}" class="dropdown-item" {% if link.new_window %}target="_blank"{% endif %}>
-                                <i class="{{ link.icon }} mr-2"></i> {% trans link.name %}
-                            </a>
-                        {% endfor %}
-                        <div class="dropdown-divider"></div>
-                        {% if perms|can_view_self %}
-                            <a href="{% jazzy_admin_url request.user request.current_app|default:"admin" %}" class="dropdown-item dropdown-footer">{% trans 'See Profile' %}</a>
-                        {% endif %}
-                    </div>
+                    
                 </li>
             </ul>
         </nav>
@@ -240,30 +210,37 @@
                             <li class="nav-item">
                                 <a href="{% url 'admin:index' %}" class="nav-link">
                                     <i class="nav-icon fas fa-th-large"></i>
-                                    <p>{% trans 'Dashboard' %}</p>
+                                    <p>الصفحة الرئيسية</p>
                                 </a>
                             </li>
 
-                            {% if jazzmin_settings.navigation_expanded %}
-                                {% for app in side_menu_list %}
-                                
-                                    <li class="nav-header">{{ app.name }}</li>
-                                    {% for model in app.models %}
-                                        <li class="nav-item">
-                                            {% if model.url %}
-                                            <a href="{{ model.url }}" class="nav-link">
-                                                <i class="nav-icon {{ model.icon }}"></i> <p>{{ model.name }}</p>
-                                            </a>
+                            
+                                {% if jazzmin_settings.navigation_expanded %}
+                                <li class="nav-item">
+                                    <a href="/acc/" class="nav-link">
+                                        <i class="nav-icon fas fa-circle"></i> <p>الحسابات</p>
+                                    </a>
+                                </li>
 
-                                                {% else %}
-                                            <span class="nav-link disabled">
-                                                <i class="nav-icon {{ model.icon }}"></i> <p>{{ model.name }}</p>
-                                            </span>
-                                        {% endif %}
-                                        </li>   
-                                    {% endfor %}
-                                {% endfor %}
-                            {% else %}
+                                <li class="nav-item">
+                                    <a href="/manufacturers/" class="nav-link">
+                                        <i class="nav-icon fas fa-circle"></i> <p>المصنعات</p>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a href="/core/" class="nav-link">
+                                        <i class="nav-icon fas fa-circle"></i> <p>التجارة</p>
+                                    </a>
+                                </li>
+
+                                        
+                                <!-- 
+                            -->
+
+                                {% else %}
+
+                                
                                 {% for app in side_menu_list %}
                                     <li class="nav-item has-treeview">
                                         <a href="#" class="nav-link">
@@ -282,7 +259,10 @@
                                         </ul>
                                     </li>
                                 {% endfor %}
-                            {% endif %}
+                            
+                                {% endif %} 
+
+
                         </ul>
                     </nav>
                 </div>
@@ -388,6 +368,7 @@
     </div>
 </div>
 {% endif %}
+
 
 <!-- jQuery -->
 <script src="{% static "admin/js/vendor/jquery/jquery.js" %}"></script>

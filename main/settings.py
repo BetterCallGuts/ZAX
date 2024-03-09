@@ -63,20 +63,7 @@ DATABASES = {
 'NAME': BASE_DIR / 'db.sqlite3',
 }
 }
-AUTH_PASSWORD_VALIDATORS = [
-{
-'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-},
-{
-'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-},
-{
-'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-},
-{
-'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-},
-]
+
 brand = "ZAX"
 
 JAZZMIN_SETTINGS = {
@@ -104,10 +91,10 @@ JAZZMIN_SETTINGS = {
     "welcome_sign": f"welcome to {brand} system",
 
     # Copyright on the footer
-    "copyright": "Omar Hosny AbdElmotaleb|omarhosnay09@gmail.com",
+    "copyright": "omarhosnay09@gmail.com",
     # "custom_css": "css/main.css",
     # "custom_js": "common/js/main.js"
-    "search_model" : ['core.zabon', "core.Warehouse", "core.Products"]
+    # "search_model" : ['core.zabon', "core.Warehouse", "core.Products"]
     }
 
 
@@ -122,7 +109,7 @@ JAZZMIN_UI_TWEAKS = {
     "brand_small_text": False,
     "brand_colour": "navbar-white",
     "accent": "accent-primary",
-    "navbar": "navbar-info navbar-dark",
+    "navbar": "navbar-white navbar-light",
     "no_navbar_border": False,
     "navbar_fixed": False,
     "layout_boxed": False,
@@ -135,11 +122,11 @@ JAZZMIN_UI_TWEAKS = {
     "sidebar_nav_compact_style": False,
     "sidebar_nav_legacy_style": True,
     "sidebar_nav_flat_style": False,
-    "theme": "default",
+    "theme": "sketchy",
     "dark_mode_theme": None,
     "button_classes": {
-        "primary": "btn-primary",
-        "secondary": "btn-secondary",
+        "primary": "btn-outline-primary",
+        "secondary": "btn-outline-secondary",
         "info": "btn-info",
         "warning": "btn-warning",
         "danger": "btn-danger",

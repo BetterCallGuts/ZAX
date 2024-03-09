@@ -1,18 +1,19 @@
 from typing import Any
 from django.contrib import admin
 from .models import (Warehouse, 
-Products, ProductTypes,
+Products,
 WarehouseProductRel,
 sales,
 zabon,
 saler,
 fwater,
 Shop,
-Factory
+
 
 )
 from django.contrib.admin.models import LogEntry
-
+from main.admin import omar_admin_site
+from manufacturers.models import ManfComponentRel
 # from django.db.models import Sum, Avg
 # Register your models here.
 
@@ -66,7 +67,7 @@ class ProductsFilter(admin.SimpleListFilter):
       for shop in queryset:
           
           if item.shop_in == shop:
-            print("if happened")
+            
             returned_list.append(shop.id)
             
       
@@ -101,39 +102,42 @@ class WareHouseProduct(admin.ModelAdmin):
 
 class ProductAdmin(admin.ModelAdmin):
 
+  
+  
+  def formfield_for_foreignkey(self, db_field, request, **kwargs):
+    
+    
+    if db_field.name == "mnaf":
+
+        g = []
+        x = ManfComponentRel.objects.all()
+        for i in x:
+          if i.check_status() == "جاهز للبيع":
+            g.append(i.pk)
+
+
+        
+        kwargs["queryset"] = ManfComponentRel.objects.filter(id__in=g)
+
+    return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
   list_display = (
-    "p_type",
-    "name",
-    "amount",
-    "salary",
-    'got_it_from',
-    "shop_in",
+    "mnaf",
+    "price",
+    "shopin"
   )
-
-  list_filter = (
-    "p_type",
-    'got_it_from',
-    "shop_in",
+  
+  inlines = (
+    warehouseProduectRelInine,
   )
-
-  search_fields = (
-   
-    "name"  ,
-    "amount",
-    "salary",
-    "shop_in",
-     
-  )
-
-
-  inlines = (warehouseProduectRelInine,
-             SalesProduectRelInine)
-
+  
+  
 class   SalesAdmin(admin.ModelAdmin):
   
   list_display = (
     "what_got_saled",
     "how_many",
+    "win",
     'who_bought',
     "time_added"
   )
@@ -165,7 +169,8 @@ class zabonAdminStyle(admin.ModelAdmin):
     "how_muchd"
   )
   list_tatals = []
-  
+  SalesProduectRelInine.verbose_name_plural ="المنتج داخل المخازن"
+
   inlines = (
     SalesProduectRelInine,
     
@@ -192,13 +197,7 @@ class salerAdminStyle(admin.ModelAdmin):
     
   )
   
-  
-class ProductTypeAdmin(admin.ModelAdmin):
-  
-  inlines = (
-    ProdTypeRelInline
-    ,)
-  
+
 class fwaterAdmin(admin.ModelAdmin):
   
   list_display = (
@@ -219,38 +218,23 @@ class ShopAdminStyle(admin.ModelAdmin):
     "name",
     "how_many_in_me",
   )
-  inlines      = ( ProdTypeRelInline,)
+  # inlines      = ( ProdTypeRelInline,)
   list_filter  = (ProductsFilter,)
 
 
 
-class FactoryAdminStyle(admin.ModelAdmin):
-  list_display = (
-    "name", 
-    "spic",
-  )
-  
-  list_filter = (
-    "spic",
-    
-  )
-
-  search_fields = (
-    "name",
-    "addr",
-    
-  )
 
 
-admin.site.register(Warehouse   , WareHouseProduct)
-admin.site.register(Products    , ProductAdmin)
-admin.site.register(ProductTypes, ProductTypeAdmin)
-admin.site.register(zabon       , zabonAdminStyle)
-admin.site.register(sales       , SalesAdmin)
-admin.site.register(saler       , salerAdminStyle)
-admin.site.register(fwater      , fwaterAdmin)
-admin.site.register(Shop        , ShopAdminStyle)
-admin.site.register(Factory     , FactoryAdminStyle)
+
+omar_admin_site.register(Warehouse   , WareHouseProduct)
+omar_admin_site.register(Products    , ProductAdmin )
+
+omar_admin_site.register(zabon       , zabonAdminStyle)
+omar_admin_site.register(sales       , SalesAdmin)
+omar_admin_site.register(saler       , salerAdminStyle)
+omar_admin_site.register(fwater      , fwaterAdmin)
+omar_admin_site.register(Shop        , ShopAdminStyle)
+
 
 # admin.site.register(LogEntry)``
 

@@ -1,0 +1,341 @@
+{% extends "admin/base_site.html" %}
+{% comment %} {% extends "admin/change_form.html" %} {% endcomment %}
+
+{% load static  %}
+
+
+
+{% block page_content %}
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+
+      <a href="/manufacturers/manfcomponentrel/" class="btn btn-primary go-back-btn">Go Back</a>
+    </div>
+  </div>
+  </div>
+  
+<form action="{% url 'post_product' %}" method="post">
+{% csrf_token %}
+  <script src="{% static "js/HTMX.js" %}"></script>
+
+  
+  <div class="" style="margin: 0 100px ;">
+
+  <div class="form-group">
+    
+{% for m in messages  %}
+
+
+
+<div class="alert alert-success alert-dismissible">
+  <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×
+  </button>
+  <p class="text-center">
+
+    {{m}}
+  </p>
+  </div>
+  
+  
+  
+  
+  {% endfor %}
+    <div class="d-flex align-items-center gap-3">
+
+      <input type="text" 
+      list="items"
+    hx-post   ="{% url 'check_product' %}"
+    placeholder="اسم المنتج"
+    hx-trigger="keyup"
+    hx-target =".component"
+    name="prod"
+    class="form-control " 
+    style="margin: 20px 10px;"
+    tabindex="-1" 
+    aria-hidden="true" 
+    required
+    value="{{original.manf.name}}"
+    >
+      <label for="" class="d-flex align-items-center" >
+        <div  class="d-flex align-items-center">
+
+          <span>
+            
+            :المنتج
+          </span>
+        </div>
+      
+      </label>
+<!--  -->
+    <input type="number" 
+
+    class="form-control " 
+    style="margin: 20px 10px;"
+    tabindex="-1" 
+    aria-hidden="true" 
+    required
+    {% if original %}
+    value="{{original.pk}}"
+    name="obj_pk"
+
+    hidden
+    {% else %}
+    name="how_many"
+    
+    {% endif %}
+    placeholder="كم عدد تريد صنعة؟"
+    >
+    {% if original %}
+      
+    {% else %}
+
+    <label for="" class="d-flex align-items-center" >
+      <div  class="d-flex align-items-center">
+        
+        <span>
+          
+          :الكمية
+        </span>
+      </div>
+      
+    </label>
+    {% endif %}
+    <!--  -->
+    {% if perms.manufacturers.can_give_perm and original %}
+      
+
+
+    {% else %}
+    <input type="number" 
+    
+    class="form-control " 
+    style="margin: 20px 10px;"
+    tabindex="-1" 
+    aria-hidden="true" 
+    required
+    name="how_many_days"
+    placeholder="سيستغرق كم يوما؟"
+    {% if original %}
+    value="{{original.howmany_days_manf}}"
+    
+    {% endif %}
+
+    ><label for="" class="d-flex align-items-center" >
+      <div  class="d-flex align-items-center">
+
+        <span>
+          
+          :سيستغرق كم يوما
+        </span>
+      </div>
+      
+    </label>
+    
+  </div>
+  {% endif %}
+    <datalist class=""  id="items">
+
+      {% for choice in choices %}
+      
+      <option data-name="{{ choice.name }}" value="{{ choice.name}}" >
+        {{ choice.name }}
+          </option>
+          
+          {% endfor %}
+          
+        </datalist>
+      </div>
+      
+      <datalist id="compo">
+        {% for s in components %}
+          <option
+          data-name="{{s.name}}" 
+          value="{{s.name}}"
+          >{{s.name}}</option>
+        {% endfor %}
+      </datalist>
+      
+      {% if original and perms.manufacturers.can_give_perm %}
+
+        <div>
+          <div class="form-control d-flex justify-content-between align-items-center" style="padding: 40px 20px;"> 
+            <div>
+              
+              <input type="checkbox" {% if original.have_perm_to_manf %}
+              
+              checked
+              {% endif %}  name="ismanf"   >
+              
+              <label for="">هل يتم التصنيع؟</label>
+            </div>
+            <div>
+
+              <input type="number" 
+              value="{% if original.howmany_days_manf %}{{original.howmany_days_manf}}{% else %}0{% endif %}" 
+              placeholder="عدد الايام"
+              name="how_many_days"
+              >
+              <label for="">عدد الايام</label>
+            </div>
+          </div>
+
+          <div class="form-control d-flex justify-content-between align-items-center" style="padding: 40px 20px;">
+            <div>
+
+              <input type="checkbox" 
+              {% if original.have_perm_to_dhan %}
+              checked
+              {% endif %}
+              name="isdhan"    >
+              <label for="">هل يتم الدهان؟</label>
+            </div>
+            <div>
+
+              <input type="number" value="{% if original.howmany_days_dhan %}{{original.howmany_days_dhan}}{% else %}0{% endif %}" 
+              name="howmany_days_dhan" placeholder="عدد الايام">
+              <label for="">عدد الايام</label>
+            </div>
+          </div>
+            
+          <div class="form-control d-flex justify-content-between align-items-center" style="padding: 40px 20px;">
+            <div>
+
+              <input 
+              {% if original.have_perm_to_tshteb %}
+              checked
+              {% endif %}
+              
+
+              type="checkbox" name="istshteb"  >
+              <label for="">هل يتم التشطيب؟</label>
+            </div>
+            <div>
+
+              <input value="{% if original.howmany_days_tshteb %}{{original.howmany_days_tshteb}}{% else %}0{% endif %}" 
+              type="number" name="howmany_days_tshteb" placeholder="عدد الايام">
+              <label for="">عدد الايام</label>
+            </div>  
+          </div>
+
+        </div>
+        
+      {% endif %}
+
+
+      <div  class="component">
+        
+        {% if original %}
+          {% for c in original.component.all %}
+            <div class="bg-light px-2 py-4 gap-3 component form-group d-flex justify-content-around">
+
+              <input type="text"    required  value="{{c.component}}" name="name{{forloop.counter}}" class="form-control mx-3" placeholder="اسم القطعة" list="compo">
+              <input type="number"  required  value="{{c.how_many}}" name="howmuch{{forloop.counter}}" class="form-control mx-3" placeholder="العدد المطلوب">
+              <button type="button" class="btn btn-danger btn-sm remove-btns">Remove</button>
+            </div>
+          {% endfor %}
+
+            <script>
+              var k   = document.querySelectorAll('.remove-btns');
+
+              var aaaa = 0;
+              for (aaaa; aaaa < k.length; aaaa++) {
+                  k[aaaa].addEventListener('click', (e) => {
+                  e.preventDefault();
+                  e.target.closest('.form-group').remove();
+                  });
+            }
+            delete k , aaaa
+            </script>
+            
+        {% endif %}
+        
+      </div>
+      <div class="btns mb-5">
+
+        <button class='add btn btn-info' >اضف قطعة</button>
+        <input type='submit' class="btn btn-success" value="احفظ" />
+      </div>
+
+    </div>
+    
+    <script>
+      let btnnn     = document.querySelector(".add");
+      let component = document.querySelector(".component"); 
+      let input     = document.querySelector("[name='prod']");
+      let lll       = 0
+      let first     = true
+      
+
+      // 
+      btnnn.addEventListener("click", (e)=>{
+        e.preventDefault();
+
+        if (input.value){
+          // 
+          let last      = document.querySelector("#last");
+          if (last != null) {
+            if (first) {
+              let index     = last.querySelector("input") 
+              let attrname  = index.getAttribute("name").match(/\d+/)[0]
+              
+              
+              first = false 
+              lll  = attrname
+            }
+          }else{
+            if (first) {
+              
+              lll = 0
+            }
+          }
+          
+          // .match(/\d+/)[0]
+
+          lll ++
+          // 
+          lll
+          let newDiv = document.createElement("div");
+          newDiv.className = "bg-light px-2 py-4 gap-3  form-group d-flex justify-content-around";
+          newDiv.innerHTML = `
+            
+          
+    <input type="text"    required value="" name="name${lll}" class="form-control mx-3" placeholder="اسم القطعة" list="compo">
+    <input type="number"  required value="0" name="howmuch${lll}" class="form-control mx-3" placeholder="العدد المطلوب">
+    <button type="button" class="btn btn-danger btn-sm remove-btns">Remove</button>
+
+          `;
+
+          component.appendChild(newDiv)
+
+          let delbtns   = document.querySelectorAll('.remove-btns');
+      
+      
+          
+        let a = 0;
+        for (a; a < delbtns.length; a++) {
+        
+        delbtns[a].addEventListener('click', (e) => {
+            e.preventDefault();
+            e.target.closest('.form-group').remove();
+            });
+      }
+          // component.innerHTML += `
+          // <div class="bg-light px-2 py-4 gap-3  form-group d-flex justify-content-around">
+          //   <input type="text"   value=""   name="name${lll}" class="form-control mx-3"  placeholder="اسم القطعة"    list="compo">
+          //   <input type="number" value="0"   name="howmuch${lll}" class="form-control mx-3"  placeholder="العدد المطلوب"  >
+          //   </div>
+          //   `
+          // }
+      }})
+
+    </script>
+  </form>
+  <style>
+    footer{
+      margin: 0 !important;
+      width: 100% !important;
+    }
+  </style>
+{% endblock page_content %} 
